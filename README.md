@@ -1,10 +1,10 @@
 # nmail
-### SMTP mail sender.
+## SMTP mail sender.
 
 With this package you will able to send mails in 1 line.
 There is two operations mode:
 
-#### __Config mode__:
+### __Config mode__:
    
    Use `config.yml` to specify next variables:
         
@@ -27,7 +27,7 @@ There is two operations mode:
                   
    > If you will not specify __config__ variable - by default nmail will pick config.yml __from package folder__
    
-#### __Inline mode__:
+### __Inline mode__:
    
    Send Email inline:
            
