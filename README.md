@@ -10,7 +10,7 @@ There is two operations mode:
         
         smtp_server: '10.0.0.1'
         smtp_port: 587
-        login: 'username'
+        login: 'username@corp.com'
         password: 'password'
    
    Send email with specifying __config.yml__ file:
@@ -41,7 +41,7 @@ There is two operations mode:
                            send_as='delegated_mailbox@example.com',
                            smtp_server='10.0.0.1'
                            smtp_port=587
-                           login='username'
+                           login='username@corp.com'
                            password='password')
                      
    Also, you may override some of parameters by specifying it in the send_mail function call.

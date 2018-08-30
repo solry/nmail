@@ -1,4 +1,4 @@
 smtp_server: '10.0.0.1'
 smtp_port: 587
-login: 'username'
+login: 'username@corp.com'
 password: 'password'

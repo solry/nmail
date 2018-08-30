@@ -35,6 +35,7 @@ def send_mail(to=(), cc=None, bcc=None,
     #  Configuration:
     if import_yaml:
         if config_file == 'default':
+            # Get default config file from package folder:
             config_file = os.path.dirname(os.path.abspath(__file__)) + '/config.yml'
 
         config = __read_config(config_file)
@@ -136,13 +137,15 @@ def __update_config(smtp_server, smtp_port, login, password, config):
 
 
 def __verify_config(smtp_server, smtp_port, login, password):
-    WARNING_MESSAGE = '{} configured impoperly. Expected type: {}'
+    WARNING_MESSAGE = '{} configured impoperly.\n' \
+                      'Expected type: {}\n'\
+                      'Configured value: {}'
 
     if type(smtp_server) != str:
-        raise ConfigurationError(WARNING_MESSAGE.format(('smtp_server', 'str')))
+        raise ConfigurationError(WARNING_MESSAGE.format('smtp_server', 'str', smtp_server))
     if type(smtp_port) != int:
-        raise ConfigurationError(WARNING_MESSAGE.format(('smtp_port', 'int')))
+        raise ConfigurationError(WARNING_MESSAGE.format('smtp_port', 'int', smtp_port))
     if type(login) != str:
-        raise ConfigurationError(WARNING_MESSAGE.format(('login', 'str')))
+        raise ConfigurationError(WARNING_MESSAGE.format('login', 'str', login))
     if type(password) != str:
-        raise ConfigurationError(WARNING_MESSAGE.format(('password', 'str')))
+        raise ConfigurationError(WARNING_MESSAGE.format('password', 'str', password))
