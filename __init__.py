@@ -1,4 +1,7 @@
 import os
+import re
+
+import yaml
 import smtplib
 import traceback
 from email import encoders
@@ -8,34 +11,49 @@ from email.mime.multipart import MIMEMultipart
 
 COMMASPACE = ', '
 
-def send_mail(to=(), cc=(),
+class AttachmentError(Exception):
+    pass
+
+class ConfigurationError(Exception):
+    pass
+
+def send_mail(to=(), cc=None,
               subject='No subject',
               text='No Text',
               attachments=(),
               send_as=None,
-              detail_answer=False,
-              smtp_server=None, smtp_port=587,
-              login=None, password=None):
+              smtp_server=None, smtp_port=None,
+              login=None, password=None,
+              config_file='default'):
 
 
-    outer = MIMEMultipart()
-    outer['Subject'] = subject
+    #  Configuration:
+    if config_file == 'default':
+        config_file = os.path.dirname(os.path.abspath(__file__)) + 'config.yml'
+
+    config = __read_config(config_file)
+    smtp_server, smtp_port, login, password = __update_config(smtp_server, smtp_port, login, password, config)
+    __verify_config(smtp_server, smtp_port, login, password)
+
+    #  Message construction:
+    mesg = MIMEMultipart()
+    mesg['Subject'] = subject
     if send_as:
-        outer['From'] = send_as
+        mesg['From'] = send_as
     else:
-        outer['From'] = login
+        mesg['From'] = login
 
-    outer['To'] = COMMASPACE.join(to)
+    mesg['To'] = COMMASPACE.join(to)
     if cc:
-        outer['Cc'] = COMMASPACE.join(cc)
+        mesg['Cc'] = COMMASPACE.join(cc)
 
-    outer.preamble = '\n'
+    mesg.preamble = '\n'
 
     recipients = to + cc
 
-    __attach(outer, attachments)
-    outer.attach(MIMEText(text, 'plain'))
-    composed = outer.as_string()
+    __attach(mesg, attachments)
+    mesg.attach(MIMEText(text, 'plain'))
+    composed = mesg.as_string()
 
     # Send the email
     try:
@@ -53,7 +71,13 @@ def send_mail(to=(), cc=(),
         traceback.print_exc()
         return False
 
-def __attach(outer, attachments):
+
+def __attach(mesg, attachments):
+    """
+    :param mesg: MIME-Multipart message
+    :param attachments:  List of attachments
+    :return:
+    """
     for file in attachments:
         try:
             with open(file, 'rb') as fp:
@@ -61,10 +85,53 @@ def __attach(outer, attachments):
                 msg.set_payload(fp.read())
             encoders.encode_base64(msg)
             msg.add_header('Content-Disposition', 'attachment', filename=os.path.basename(file))
-            outer.attach(msg)
+            mesg.attach(msg)
         except:
             traceback.print_exc()
             raise AttachmentError(f'Unable to attach file: {file}')
 
-class AttachmentError(Exception):
-    pass
+
+def __read_config(config_file):
+    """
+    Read config from yaml file
+    :param config_file:
+    :return:
+    """
+    with open(config_file, 'r') as f:
+        config = yaml.load(f)
+    return config
+
+
+def __update_config(smtp_server, smtp_port, login, password, config):
+    """
+    Update configuration variables
+    :param smtp_server:
+    :param smtp_port:
+    :param login:
+    :param password:
+    :param config:
+    :return:
+    """
+    if smtp_server is None:
+        smtp_server = config.get(smtp_server)
+    if smtp_port is None:
+        smtp_port = config.get(smtp_port)
+    if login is None:
+        login = config.get(login)
+    if password is None:
+        password = config.get(password)
+
+    return smtp_server, smtp_port, login, password
+
+
+def __verify_config(smtp_server, smtp_port, login, password):
+    WARNING_MESSAGE = '{} configured impoperly. Expected type: {}'
+
+    if type(smtp_server) != str:
+        raise ConfigurationError(WARNING_MESSAGE.format(('smtp_server', 'str')))
+    if type(smtp_port) != int:
+        raise ConfigurationError(WARNING_MESSAGE.format(('smtp_port', 'int')))
+    if type(login) != str:
+        raise ConfigurationError(WARNING_MESSAGE.format(('login', 'str')))
+    if type(password) != str:
+        raise ConfigurationError(WARNING_MESSAGE.format(('password', 'str')))
