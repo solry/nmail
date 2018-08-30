@@ -17,7 +17,7 @@ class AttachmentError(Exception):
 class ConfigurationError(Exception):
     pass
 
-def send_mail(to=(), cc=None,
+def send_mail(to=(), cc=None, bcc=None,
               subject='No subject',
               text='No Text',
               attachments=(),
@@ -43,13 +43,19 @@ def send_mail(to=(), cc=None,
     else:
         mesg['From'] = login
 
-    mesg['To'] = COMMASPACE.join(to)
+
+    recipients = []
+    if to:
+        mesg['To'] = COMMASPACE.join(to)
+        recipients.extend(list(to))
     if cc:
         mesg['Cc'] = COMMASPACE.join(cc)
+        recipients.extend(list(cc))
+    if bcc:
+        mesg['Bcc'] = COMMASPACE.join(bcc)
+        recipients.extend(list(bcc))
 
     mesg.preamble = '\n'
-
-    recipients = to + cc
 
     __attach(mesg, attachments)
     mesg.attach(MIMEText(text, 'plain'))
