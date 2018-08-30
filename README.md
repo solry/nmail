@@ -1,19 +1,19 @@
 # nmail
-SMTP mail sender.
+###SMTP mail sender.
 
-With this package you will able to send letters in 1 line.
+With this package you will able to send mails in 1 line.
 There is two operations mode:
 
-1) __Config mode__:
+#### __Config mode__:
    
-   Use config.yml to specify next variables:
+   Use `config.yml` to specify next variables:
         
         smtp_server: '10.0.0.1'
         smtp_port: 587
         login: 'username@corp.com'
         password: 'password'
    
-   Send email with specifying __config.yml__ file:
+   Send email with specifying `config.yml` file:
         
         import nmail
         nmail.send_mail(to=['mybro@example.com','someone@example.com'], 
@@ -25,9 +25,9 @@ There is two operations mode:
                         send_as='delegated_mailbox@example.com',
                         config='/tmp/config.yml')
                   
-   If you will not specify __config__ variable - by default nmail will pick config.yml __from package folder__
+   > If you will not specify __config__ variable - by default nmail will pick config.yml __from package folder__
    
-2) __Inline mode__:
+#### __Inline mode__:
    
    Send Email inline:
            
@@ -44,6 +44,6 @@ There is two operations mode:
                            login='username@corp.com'
                            password='password')
                      
-   Also, you may override some of parameters by specifying it in the send_mail function call.
+   > Also, you may override some of parameters by __specifying__ it in the `send_mail` function call.
    Other params will be gathered from __config file__
    
