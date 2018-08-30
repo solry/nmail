@@ -1,13 +1,18 @@
 import os
-import re
-
-import yaml
 import smtplib
 import traceback
 from email import encoders
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
+
+try:
+    import yaml
+    import_yaml = True
+except (ModuleNotFoundError, ImportError):
+    print('yaml module has not been imported. '
+          'config.yml file will not be read')
+    import_yaml = False
 
 COMMASPACE = ', '
 
@@ -28,11 +33,13 @@ def send_mail(to=(), cc=None, bcc=None,
 
 
     #  Configuration:
-    if config_file == 'default':
-        config_file = os.path.dirname(os.path.abspath(__file__)) + 'config.yml'
+    if import_yaml:
+        if config_file == 'default':
+            config_file = os.path.dirname(os.path.abspath(__file__)) + '/config.yml'
 
-    config = __read_config(config_file)
-    smtp_server, smtp_port, login, password = __update_config(smtp_server, smtp_port, login, password, config)
+        config = __read_config(config_file)
+        smtp_server, smtp_port, login, password = __update_config(smtp_server, smtp_port, login, password, config)
+
     __verify_config(smtp_server, smtp_port, login, password)
 
     #  Message construction:
@@ -56,11 +63,9 @@ def send_mail(to=(), cc=None, bcc=None,
         recipients.extend(list(bcc))
 
     mesg.preamble = '\n'
-
     __attach(mesg, attachments)
     mesg.attach(MIMEText(text, 'plain'))
     composed = mesg.as_string()
-
     # Send the email
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as s:
@@ -68,7 +73,7 @@ def send_mail(to=(), cc=None, bcc=None,
             s.starttls()
             s.ehlo()
             s.login(login, password)
-            s.sendmail(send_as, recipients, composed)
+            s.sendmail(mesg['From'], recipients, composed)
             s.close()
 
         return True
