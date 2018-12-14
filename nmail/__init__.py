@@ -39,7 +39,6 @@ def send_mail(to=(), cc=None, bcc=None,
             config_file = os.path.dirname(os.path.abspath(__file__)) + '/config.yml'
 
         config = __read_config(config_file)
-        print(config)
         smtp_server, smtp_port, login, password = __update_config(smtp_server, smtp_port, login, password, config)
 
     __verify_config(smtp_server, smtp_port, login, password)
