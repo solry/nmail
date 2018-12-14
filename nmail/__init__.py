@@ -39,6 +39,7 @@ def send_mail(to=(), cc=None, bcc=None,
             config_file = os.path.dirname(os.path.abspath(__file__)) + '/config.yml'
 
         config = __read_config(config_file)
+        print(config)
         smtp_server, smtp_port, login, password = __update_config(smtp_server, smtp_port, login, password, config)
 
     __verify_config(smtp_server, smtp_port, login, password)
@@ -125,14 +126,13 @@ def __update_config(smtp_server, smtp_port, login, password, config):
     :return:
     """
     if smtp_server is None:
-        smtp_server = config.get(smtp_server)
+        smtp_server = config.get('smtp_server')
     if smtp_port is None:
-        smtp_port = config.get(smtp_port)
+        smtp_port = config.get('smtp_port')
     if login is None:
-        login = config.get(login)
+        login = config.get('login')
     if password is None:
-        password = config.get(password)
-
+        password = config.get('password')
     return smtp_server, smtp_port, login, password
 
 
@@ -140,7 +140,6 @@ def __verify_config(smtp_server, smtp_port, login, password):
     WARNING_MESSAGE = '{} configured impoperly.\n' \
                       'Expected type: {}\n'\
                       'Configured value: {}'
-
     if type(smtp_server) != str:
         raise ConfigurationError(WARNING_MESSAGE.format('smtp_server', 'str', smtp_server))
     if type(smtp_port) != int:

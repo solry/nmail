@@ -10,7 +10,7 @@ setuptools.setup(
     author_email="solyanikry@gmail.com",
     description="One-line SMPT email sender",
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    #long_description_content_type="text/markdown",
     url="https://github.com/solry/nmail",
     packages=setuptools.find_packages(),
     classifiers=[
