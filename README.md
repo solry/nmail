@@ -1,5 +1,5 @@
 # nmail
-## SMTP mail sender.
+### SMTP mail sender.
 
 With this package you will able to send mails in 1 line.
 There is two operations mode:
